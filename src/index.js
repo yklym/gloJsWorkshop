@@ -96,37 +96,12 @@ function actionPage() {
         search = document.querySelector(".search-wrapper_input"),
         searchBtn = document.querySelector(".search-btn");
 
-    function addTmpStyleClass(className, classPropertiesList) {
-        let style = document.createElement('style');
-        let classPropertiesString = classPropertiesList.join(";");
-        classPropertiesString += ";";
-        style.type = 'text/css';
-        style.innerHTML = `.${className} {${classPropertiesString}}`;
-        console.log(`.${className} {${classPropertiesString}}`);
-        document.getElementsByTagName('head')[0].appendChild(style);
-
-        // document.getElementById('someElementId').className = 'cssClass';
-    }
-
-    addTmpStyleClass("hiddenByDiscount", ["display : none"]);
-    addTmpStyleClass("hiddenByPrice", ["display : none"]);
-
-
     // DISCOUNT
-    discountCheckbox.addEventListener("click", function () {
-        cards.forEach(function (card) {
-            if (discountCheckbox.checked) {
-                if (!card.querySelector(".card-sale")) {
-                    card.parentNode.style.display = "none";
-                }
-            } else {
-                card.parentNode.style.display = "";
-            }
-        });
-    });
+    discountCheckbox.addEventListener("click",filterPrice );
     // MIN-MAX
-    min.addEventListener("change", filterPrice);
-    max.addEventListener("change", filterPrice);
+    min.addEventListener("input", filterPrice);
+    max.addEventListener("input", filterPrice);
+
 
     function filterPrice() {
         cards.forEach(function (card) {
@@ -136,11 +111,17 @@ function actionPage() {
             console.log(price);
 
             if ((min.value && price < min.value) || (max.value && price > max.value)) {
-                // card.parentNode.style.display = "none";
-                card.parentNode.classList.add("hiddenByPrice");
+                card.parentNode.style.display = "none";
             } else {
-                // card.parentNode.style.display = "";
-                card.parentNode.classList.remove("hiddenByPrice");
+                card.parentNode.style.display = "";
+
+                if (discountCheckbox.checked) {
+                    if (!card.querySelector(".card-sale")) {
+                        card.parentNode.style.display = "none";
+                    }
+                } else {
+                    card.parentNode.style.display = "";
+                }
             }
         });
     }
