@@ -95,6 +95,23 @@ function actionPage() {
         max = document.getElementById("max"),
         search = document.querySelector(".search-wrapper_input"),
         searchBtn = document.querySelector(".search-btn");
+
+    function addTmpStyleClass(className, classPropertiesList) {
+        let style = document.createElement('style');
+        let classPropertiesString = classPropertiesList.join(";");
+        classPropertiesString += ";";
+        style.type = 'text/css';
+        style.innerHTML = `.${className} {${classPropertiesString}}`;
+        console.log(`.${className} {${classPropertiesString}}`);
+        document.getElementsByTagName('head')[0].appendChild(style);
+
+        // document.getElementById('someElementId').className = 'cssClass';
+    }
+
+    addTmpStyleClass("hiddenByDiscount", ["display : none"]);
+    addTmpStyleClass("hiddenByPrice", ["display : none"]);
+
+
     // DISCOUNT
     discountCheckbox.addEventListener("click", function () {
         cards.forEach(function (card) {
@@ -119,9 +136,11 @@ function actionPage() {
             console.log(price);
 
             if ((min.value && price < min.value) || (max.value && price > max.value)) {
-                card.parentNode.style.display = "none";
+                // card.parentNode.style.display = "none";
+                card.parentNode.classList.add("hiddenByPrice");
             } else {
-                card.parentNode.style.display = "";
+                // card.parentNode.style.display = "";
+                card.parentNode.classList.remove("hiddenByPrice");
             }
         });
     }
@@ -131,9 +150,11 @@ function actionPage() {
         cards.forEach(function (card) {
             const title = card.querySelector(".card-title");
             if (!searchText.test(title.textContent)) {
-                card.parentNode.style.display = "none";
+                card.parentNode.classList.add("hiddenByDiscount");
+                // card.parentNode.style.display = "none";
             } else {
-                card.parentNode.style.display = "";
+                card.parentNode.classList.remove("hiddenByDiscount");
+                // card.parentNode.style.display = "";
             }
         });
         search.value = "";
