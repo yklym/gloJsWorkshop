@@ -97,7 +97,7 @@ function actionPage() {
         searchBtn = document.querySelector(".search-btn");
 
     // DISCOUNT
-    discountCheckbox.addEventListener("click",filterPrice );
+    discountCheckbox.addEventListener("click", filterPrice);
     // MIN-MAX
     min.addEventListener("input", filterPrice);
     max.addEventListener("input", filterPrice);
@@ -145,13 +145,97 @@ function actionPage() {
 }
 
 
+// receiving data from server
+
+function getData() {
+    const goodsWrapper = document.querySelector(".goods");
+    return fetch("../db/db.json ").then(function (responce) {
+            if (responce.ok) {
+                // console.log(responce);
+                return responce.json();
+            } else {
+                throw new Error(responce.status);
+            }
+        }).then(function (data) {
+            return data;
+        })
+        .catch(function (err) {
+            console.warn(err);
+            goodsWrapper.innerHTML = "<div><h1>Oops, something got wrong!</h1></div>";
+
+        });
 
 
+    // console.log(fetch("../db/db.json "));
 
-addCart();
-toggleCart();
-toggleCheckbox();
-actionPage();
+}
+
+function renderCards(data) {
+    const goodsWrapper = document.querySelector(".goods");
+    data.goods.forEach(function (good) {
+        const card = document.createElement("div");
+        card.className = "col-12 col-md-6 col-lg-4 col-xl-3";
+        card.innerHTML = `
+        <div class="card" data-category = "${good.category}">
+            ${good.sale ? '<div class="card-sale">🔥Hot Sale🔥</div>' : "" }
+            <div class="card-img-wrapper">
+                <span class="card-img-top"
+                    style="background-image: url(${good.img})"></span>
+            </div>
+            <div class="card-body justify-content-between">
+                <div class="card-price">${good.price} ₽</div>
+                <h5 class="card-title">${good.title}</h5>
+                <button class="btn btn-primary">В корзину</button>
+            </div>
+        </div>
+        `;
+        goodsWrapper.appendChild(card);
+    });
+}
+
+function renderCatalog() {
+    const cards = document.querySelectorAll(".goods .card");
+    const catalogList = document.querySelector(".catalog-list");
+    const categories = new Set();
+    const catalogBtn = document.querySelector(".catalog-button");
+    const catalogWrapper = document.querySelector(".catalog");
+    cards.forEach(function (card) {
+        categories.add(card.dataset.category);
+    });
+
+    categories.forEach(function (item) {
+        const li = document.createElement("li");
+        li.textContent = item;
+        catalogList.appendChild(li);
+    });
+
+    catalogBtn.addEventListener("click", function (event) {
+        if (catalogWrapper.style.display) {
+            catalogWrapper.style.display = "";
+        } else {
+            catalogWrapper.style.display = "block";
+        }
+        if (event.target.tagName === "LI") {
+            cards.forEach(card => {
+                if (card.dataset.category !== event.target.textContent) {
+                    card.parentNode.style.display = "none";
+                } else {
+                    card.parentNode.style.display = "";
+                }
+            });
+        }
+    });
+}
+
+getData().then(function (data) {
+    renderCards(data);
+    addCart();
+    toggleCart();
+    toggleCheckbox();
+    actionPage();
+    renderCatalog();
+});
+
 
 
 // sales filter
